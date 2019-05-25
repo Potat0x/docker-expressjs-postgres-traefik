@@ -1,0 +1,18 @@
+{
+  "name": "expressjs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "test"
+  },
+  "author": "potat0x",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.0"
+  },
+  "devDependencies": {
+    "pg-promise": "^8.7.2"
+  }
+}
