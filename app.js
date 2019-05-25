@@ -4,7 +4,7 @@ const port = 8080
 
 const pgp = require('pg-promise')(/* options */)
 //const db = pgp('postgres://username:password@host:port/database')
-const db = pgp('postgres://postgres:docker@localhost:5432/postgres');
+const db = pgp('postgres://postgres:docker@pg-docker:5432/postgres');
 
 app.get('/', (req, res) => res.send('Hello World!'))
 app.get('/pgtest', (req, res) => {
