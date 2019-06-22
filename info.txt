@@ -1,16 +1,26 @@
+=== Multiple Node.js containers + Postgres + Traefik ===
+
+
+http://whoami2.docker.localhost/pgtest
+http://whoami3.docker.localhost/pgtest
+http://127.0.0.1:8085/dashboard
+
+
 https://expressjs.com/en/guide/database-integration.html#postgresql
 https://devcenter.heroku.com/articles/heroku-postgresql#connecting-in-node-js
 
-
 docker build -t ziemniak/node2 .
 
-=== Multiple Node.js containers + Postgres + Traefik ===
-
 docker stop traefik_c pg-docker pg-node pg-docker2 pg-node2
+
 docker run --rm -P -d -p 80:80 -p 8085:8080 --name traefik_c --network traefik_default --volume /var/run/docker.sock:/var/run/docker.sock traefik --api --docker --docker.watch
 
 docker run --rm --name pg-docker -e POSTGRES_PASSWORD=docker -d -p 5432 -v $HOME/docker/volumes/postgres:/var/lib/postgresql/data postgres
+
+docker exec pg-docker psql -U postgres -c "create table if not exists hello_world(txt text); insert into hello_world values('Sample Textpg-docker');"
+
 docker run --rm -P -d --name pg-node -e POSTGRES_HOST=pg-docker -e POSTGRES_PASSWORD=docker --network traefik_default --label traefik.frontend.rule="Host:whoami2.docker.localhost" --label traefik.docker.network="traefik_default" ziemniak/node2
+
 
 docker network rm app_db_network
 docker network create  app_db_network --attachable
@@ -20,6 +30,9 @@ docker network connect app_db_network pg-node
 
 
 docker run --rm --name pg-docker2 -e POSTGRES_PASSWORD=docker -d -p 5432 -v $HOME/docker/volumes/postgres2:/var/lib/postgresql/data postgres
+
+docker exec pg-docker2 psql -U postgres -c "create table if not exists hello_world(txt text); insert into hello_world values('Sample Textpg-docker2');"
+
 docker run --rm -P -d --name pg-node2 -e POSTGRES_HOST=pg-docker2 -e POSTGRES_PASSWORD=docker --network traefik_default --label traefik.frontend.rule="Host:whoami3.docker.localhost" --label traefik.docker.network="traefik_default" ziemniak/node2
 
 docker network rm app_db_network2
@@ -29,9 +42,5 @@ docker network connect app_db_network2 pg-docker2
 docker network connect app_db_network2 pg-node2
 
 
-http://127.0.0.1:8085/dashboard/
-http://whoami2.docker.localhost/pgtest
-
 === localhost: npm start + postgres ===
-
 docker run --network host --rm --name pg-docker -e POSTGRES_PASSWORD=pp -d -p 127.0.0.1:5432:5432 -v $HOME/docker/volumes/postgres:/var/lib/postgresql/data postgres
